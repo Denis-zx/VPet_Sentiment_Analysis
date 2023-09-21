@@ -2,6 +2,9 @@ import requests
 import pandas as pd
 import wordcloud
 import jieba
+from snownlp import SnowNLP
+import matplotlib.pyplot as plt
+import numpy as np
 
 headers = {
     'authority': 'api.bilibili.com',
@@ -46,7 +49,6 @@ def request_comments_dataframe (bvid):
             higher_label,lower_label = info_type.split(",")
             info_list[lower_label] = list()
 
-    
         for item in data_list:
             grab_info(item,info_list)
 
@@ -69,15 +71,16 @@ def get_oid(bvid):
 bvid_list_tamo = ["BV1TL411575E","BV1Vs4y1R7dL","BV1Ty4y1k7Ms","BV1Ph41187SP"]
 bvid_list_poki = ["BV1bG4y1g7CY","BV1ub411K7Rg","BV1Us411y7Xb","BV1Cs411y7YX","BV1N84y1H7dP"]
 
-for bvid in bvid_list_poki:
+for bvid in bvid_list_tamo:
     oid = get_oid(bvid)
     print(oid)
     comment_df = request_comments_dataframe(bvid)
     all_comment = ""
+    
+    '''
     for comment in comment_df["message"]:
         all_comment+= comment
         all_comment += "\n"
-    
     
     ls = jieba.lcut(all_comment) # 生成分词列表
     text = ' '.join(ls) # 连接成字符串  
@@ -90,6 +93,21 @@ for bvid in bvid_list_poki:
     # msyh.ttc电脑本地字体，写可以写成绝对路径
     wc.generate(text) # 加载词云文本
     wc.to_file(f"{bvid}.png") # 保存词云文件
+    '''
+
+    sentiment_list = []
+    for comment in comment_df["message"]:
+        s = SnowNLP(comment)
+        sentiment_list.append(s.sentiments)
+
+    plt.hist(sentiment_list, bins = np.arange(0, 1, 0.01), facecolor = 'g')
+    plt.xlabel('Sentiments Probability')
+    plt.ylabel('Quantity')
+    plt.title('Analysis of Sentiments')
+    plt.savefig(f"Senti_Toma_{bvid}.png")
+
+
+        
 
 
 
