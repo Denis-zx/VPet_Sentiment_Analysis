@@ -1,11 +1,7 @@
 import requests
 import pandas as pd
-import json
-import os
-import time
-from time import sleep
-import random
-import logging
+import wordcloud
+import jieba
 
 headers = {
     'authority': 'api.bilibili.com',
@@ -15,17 +11,9 @@ headers = {
     'origin': 'https://www.bilibili.com'
 }
 
-def request_comments_dataframe (oid):
-    url = f"https://api.bilibili.com/x/v2/reply/wbi/main?oid={oid}&type=1&mode=3&pagination_str=%7B%22offset%22:%22%22%7D&plat=1&seek_rpid=&web_location=1315875&w_rid=95577f84c63876bbfab4d642a4196de0&wts=1695072139"
-    response = requests.get(url,headers=headers)
-    data_list = response.json()['data']['replies']
-    info_list = {}
-    required_info = ["member,mid","member,uname","member,sex","content,message"]
-    for info_type in required_info:
-        higher_label,lower_label = info_type.split(",")
-        info_list[lower_label] = list()
+required_info = ["member,mid","member,uname","member,sex","content,message"]
 
-    def grab_info (item,info_list):
+def grab_info (item,info_list):
         #Retrive info in current layer
         for info_type in required_info:
             higher_label,lower_label = info_type.split(",")
@@ -38,11 +26,74 @@ def request_comments_dataframe (oid):
         except:
             return
 
-    for item in data_list:
-        grab_info(item,info_list)
+def request_comments_dataframe (bvid):
+    url = f'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn=1&type=1&oid={bvid}'
+    response = requests.get(url,headers=headers)
+    response = response.json()
+    count = response['data']['page']["count"]
 
-    return info_list
+    comment_dataframe_allpage = pd.DataFrame(columns=[info_type.split(",")[1] for info_type in required_info])
 
-print(request_comments_dataframe("795613227"))
+    for i in range (1,count,20):
+        pagenum = i//20 + 1
+        print(f"working on page {pagenum}")
+        url = f'https://api.bilibili.com/x/v2/reply?jsonp=jsonp&pn={pagenum}&type=1&oid={bvid}'
+        response = requests.get(url,headers=headers)
+        data_list = response.json()['data']['replies']
+        info_list = {}
+        
+        for info_type in required_info:
+            higher_label,lower_label = info_type.split(",")
+            info_list[lower_label] = list()
+
+    
+        for item in data_list:
+            grab_info(item,info_list)
+
+        cur_page_comment = pd.DataFrame(info_list)
+        comment_dataframe_allpage = pd.concat([comment_dataframe_allpage,cur_page_comment],ignore_index=True)
+
+        if pagenum == 10:
+            break
+        
+    return comment_dataframe_allpage
+
+
+def get_oid(bvid):
+    oid_url = "https://api.bilibili.com/x/player/pagelist?bvid={}".format(bvid)
+    response = requests.get(oid_url, headers=headers)
+    oid = response.json()['data'][0]['cid']
+    return oid
+
+
+bvid_list_tamo = ["BV1TL411575E","BV1Vs4y1R7dL","BV1Ty4y1k7Ms","BV1Ph41187SP"]
+bvid_list_poki = ["BV1bG4y1g7CY","BV1ub411K7Rg","BV1Us411y7Xb","BV1Cs411y7YX","BV1N84y1H7dP"]
+
+for bvid in bvid_list_poki:
+    oid = get_oid(bvid)
+    print(oid)
+    comment_df = request_comments_dataframe(bvid)
+    all_comment = ""
+    for comment in comment_df["message"]:
+        all_comment+= comment
+        all_comment += "\n"
+    
+    
+    ls = jieba.lcut(all_comment) # 生成分词列表
+    text = ' '.join(ls) # 连接成字符串  
+    stopwords = ["的","是","了"] # 去掉不需要显示的词
+    wc = wordcloud.WordCloud(font_path="msyh.ttc",
+                         width = 1000,
+                         height = 700,
+                         background_color='white',
+                         max_words=100,stopwords=stopwords)
+    # msyh.ttc电脑本地字体，写可以写成绝对路径
+    wc.generate(text) # 加载词云文本
+    wc.to_file(f"{bvid}.png") # 保存词云文件
+
+
+
+
+
 
 
