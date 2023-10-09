@@ -107,3 +107,35 @@ def getTranscriptsFromVideos(videoIds):
             continue
 
     return all_transcripts
+
+# get comments in a video with a video id
+def getCommentsInVideos(videoIds):
+    comments = []
+    
+    for videoId in videoIds:
+        try:
+            print(videoId)
+            request = youtube.commentThreads().list(
+                part = "snippet",
+                videoId = videoId
+            )
+            response = request.execute()
+            commentList = response['items']
+        
+            for commentItem in commentList:
+                comment = commentItem['snippet']['topLevelComment']['snippet']
+                comments.append(comment['textDisplay'])
+                
+                if 'replies' in commentItem:
+                    print("replies")
+                    replies = commentItem['replies']['comments']
+                    print(replies)
+                    for reply in replies:
+                        reply = reply['snippet']
+                        comments.append(reply['textDisplay'])
+                        
+        except:
+            print("The video (id: " + videoId + ") has a problem.")
+            continue
+        
+    return comments

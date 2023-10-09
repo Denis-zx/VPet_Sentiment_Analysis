@@ -1,8 +1,8 @@
-import VPet_Sentiment_Analysis.youtube.youtubeFounctions as youtubeFounctions
-import VPet_Sentiment_Analysis.youtube.wordCloudFunctions as wordCloudFunctions
+from youtube import youtubeFounctions
+from youtube import wordCloudFunctions
 
 # Game: Dudde - My Virtual Pet Dog
-searchList_dudde = youtubeFounctions.getSearchList(youtubeFounctions.youtube, "Duddu | pet game", "US")
+searchList_dudde = youtubeFounctions.getSearchList(youtubeFounctions.youtube, "Duddu", "US")
 print(len(searchList_dudde))
 # titles from search list
 titles_dudde = youtubeFounctions.getTitleFormSearchList(searchList_dudde)
@@ -23,3 +23,6 @@ transcripts_in_English = youtubeFounctions.getTranscriptsFromVideos(videoIds_dud
 wordCloudFunctions.showWordCloudImage(transcripts_in_English)
 # Top 20 words from YouTube video's transcripts
 wordCloudFunctions.showTop20Words(transcripts_in_English)
+# Comments in the videos
+comments = youtubeFounctions.getCommentsInVideos(videoIds_duddes)
+print(comments)
