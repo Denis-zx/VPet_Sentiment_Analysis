@@ -102,7 +102,7 @@ for bvid in bvid_list:
     plt.xlabel('Sentiments Probability')
     plt.ylabel('Quantity')
     plt.title('Analysis of Sentiments')
-    plt.savefig(f"Senti_Toma_{bvid}.png")
+    plt.savefig(f"Senti_{filename}{count}.png")
 
 
 # Adding Excel Fomula for OpenAi  
