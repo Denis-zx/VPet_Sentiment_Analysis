@@ -11,6 +11,7 @@ youtube = build('youtube', 'v3', developerKey = apiKey)
 # get list by searching with keyword
 def getSearchList(youtube, keyword, region):
     itemList = []
+    pageCount = 0
     
     # request for search list
     request = youtube.search().list(
@@ -50,6 +51,10 @@ def getSearchList(youtube, keyword, region):
             response = request.execute()
             for item in response['items']:
                 itemList.append(item)
+            
+            pageCount = pageCount + 1
+            if pageCount == 11:
+                break
             
             if 'nextPageToken' in response:
                 nextPageToken = response['nextPageToken']

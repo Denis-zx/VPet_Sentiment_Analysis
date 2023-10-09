@@ -1,8 +1,8 @@
-from youtube import youtubeFounctions
-from common import wordCloudFunctions
+from Youtube_Eunju import youtubeFounctions
+from Youtube_Eunju import wordCloudFunctions
 
 # Data about 'Tamagotchi' game
-searchList = youtubeFounctions.getSearchList(youtubeFounctions.youtube, "tamagotchi game", "US")
+searchList = youtubeFounctions.getSearchList(youtubeFounctions.youtube, "tamagotchi", "US")
 # titles from search list
 titles = youtubeFounctions.getTitleFormSearchList(searchList)
 # wordCloud for YouTube video's title
