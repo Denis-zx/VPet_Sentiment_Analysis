@@ -6,7 +6,7 @@ import numpy as np
 import openpyxl
 
 
-# Bilibili Customization
+#Bilibili Customization
 headers = {
     'authority': 'api.bilibili.com',
     'accept': 'application/json, text/plain. */*',
@@ -79,7 +79,8 @@ filename = "bilibili_pokimon_"
 prompt = "summarized 5 key insights and output in english"
 max_comment_summarized = 70 #Adjust this if exceed the token limit for chatgpt (Excel give 400 bad request), currently chatgpt 3.5 accept 4096 token
 
-#Fetching Comment
+#Main Function
+## Fetching Comment
 count = 1
 for bvid in bvid_list:
     oid = get_oid(bvid)
@@ -92,7 +93,7 @@ for bvid in bvid_list:
 
 
 
-    #Sentiment Analysis
+    ## Sentiment Analysis
     sentiment_list = []
     for comment in comment_df["message"]:
         s = SnowNLP(comment)
@@ -105,7 +106,7 @@ for bvid in bvid_list:
     plt.savefig(f"Senti_{filename}{count}.png")
 
 
-# Adding Excel Fomula for OpenAi  
+## Adding Excel Fomula for OpenAi  
 for i in range(len(bvid_list)):
     current_dataframe = pd.read_excel(f"{filename}{i+1}.xlsx",sheet_name="Sheet1")
     workbook = openpyxl.load_workbook(f'{filename}{i+1}.xlsx')

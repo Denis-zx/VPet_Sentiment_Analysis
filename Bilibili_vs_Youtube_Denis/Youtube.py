@@ -4,10 +4,10 @@ import pandas as pd
 import openpyxl
 import math
 
-# Youtube Customization
+#Youtube Customization
 api_service_name = "youtube"
 api_version = "v3"
-# Need to generate a youtube API key (Refer to ReadME for instruction)
+## Need to generate a youtube API key (Refer to ReadME for instruction)
 DEVELOPER_KEY = "AIzaSyA9ppUqUxkEuWQ4mLBuCezDS2jfObxzmQ0"
 
 youtube = googleapiclient.discovery.build(
@@ -56,7 +56,8 @@ filename = "youtube_pokimon_"
 max_comment_summarized = 70 #Adjust this if exceed the token limit for chatgpt (Excel give 400 bad request), currently chatgpt 3.5 accept 4096 token
 prompt = "summarized 5 key insights and output in english"
 
-#Fetching Comment
+#Main Function
+## Fetching Comment
 count = 1
 for video_key in youtube_list:
     print(video_key)
@@ -64,8 +65,7 @@ for video_key in youtube_list:
     comment_df.to_excel(f'{filename}{count}.xlsx',engine='xlsxwriter')
     count += 1
 
-
-# Adding Excel Fomula for OpenAi  
+## Adding Excel Fomula for OpenAi  
 for i in range(2,2+len(youtube_list)):
     current_dataframe = pd.read_excel(f"{filename}{i+1}.xlsx",sheet_name="Sheet1")
     workbook = openpyxl.load_workbook(f'{filename}{i+1}.xlsx')
